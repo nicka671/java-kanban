@@ -4,57 +4,68 @@ import objects.Epic;
 import objects.Subtask;
 import objects.Task;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static enums.Status.*;
 
 public class TaskManager {
 
-    protected int idGenerator = 0;
-    Task task;
-    Subtask subtask;
-    Epic epic;
+    private int idGenerator = 0;
+
+
 
     // Возможность хранить задачи всех типов.
 
-    HashMap<Integer, Task> allTasks = new HashMap<>();
-    HashMap<Integer, Subtask> allSubtasks = new HashMap<>();
-    HashMap<Integer, Epic> allEpics = new HashMap<>();
+    private HashMap<Integer, Task> allTasks = new HashMap<>();
+    private HashMap<Integer, Subtask> allSubtasks = new HashMap<>();
+    private HashMap<Integer, Epic> allEpics = new HashMap<>();
 
 
     //  Получение списка всех задач.
 
-    public HashMap<Integer, Task> getAllTasks() {
-        return allTasks;
+    public ArrayList<Task> getAllTasks() {
+        ArrayList<Task> taskList = new ArrayList<>();
+        for (Task task : allTasks.values())
+        {
+            taskList.add(task);
+        }
+        return taskList;
     }
 
-    public HashMap<Integer, Subtask> getAllSubtasks() {
-        return allSubtasks;
+    public ArrayList<Subtask> getAllSubtasks() {
+        ArrayList<Subtask> subtaskList = new ArrayList<>();
+        for (Subtask subtask : allSubtasks.values()) {
+            subtaskList.add(subtask);
+        }
+        return subtaskList;
     }
 
-    public HashMap<Integer, Epic> getAllEpics() {
-        return allEpics;
-    }
+        public ArrayList<Epic> getAllEpics() {
+            ArrayList<Epic> epicsList = new ArrayList<>();
+            for (Epic epic : allEpics.values()) {
+                epicsList.add(epic);
+            }
+            return epicsList;
+        }
+
 
 
     //  Удаление всех задач.
 
-    public HashMap<Integer, Task> deleteAllTasks() {
+    public void deleteAllTasks() {
         allTasks.clear();
-        return allTasks;
     }
 
-    public HashMap<Integer, Subtask> deleteAllSubtasks() {
+    public void deleteAllSubtasks() {
         allSubtasks.clear();
-        return allSubtasks;
     }
 
-    public HashMap<Integer, Epic> deleteAllEpics() {
+    public void deleteAllEpics() {
         System.out.println("Подзадачи тоже будут удалены");
         allEpics.clear();
         allSubtasks.clear();
 
-        return allEpics;
     }
 
     //  Получение по идентификатору.
@@ -67,6 +78,12 @@ public class TaskManager {
         return allSubtasks.get(i);
     }
 
+
+    public ArrayList<Subtask> getAllSubtaskByEpicId(int i) {
+        return allEpics.get(i).getIncludedSubtasks();
+    }
+
+
     public Epic getEpic(int i) {
         return allEpics.get(i);
     }
@@ -74,8 +91,7 @@ public class TaskManager {
     // Создание. Сам объект должен передаваться в качестве параметра.
 
     public Task createTask(Task task) {
-        task = new Task();
-        idGenerator = allTasks.size() + 1;
+        idGenerator += 1;
         task.setId(idGenerator);
         task.setCurrent_status(NEW);
         allTasks.put(idGenerator, task);
@@ -85,13 +101,12 @@ public class TaskManager {
     public Subtask createSubtask(Subtask subtask, int epicId) {
 
         if (allEpics.containsKey(epicId)) {
-            subtask = new Subtask();
-            idGenerator = allSubtasks.size() + 1;
+            idGenerator += 1;
             subtask.setId(idGenerator);
             subtask.setCurrent_status(NEW);
             subtask.setEpicsId(epicId);
             allSubtasks.put(idGenerator, subtask);
-            allEpics.get(epicId).includedSubtasks.add(subtask);
+            allEpics.get(epicId).getIncludedSubtasks().add(subtask);
 
             if (allEpics.get(epicId).getCurrent_status() == DONE) {
                 allEpics.get(epicId).setCurrent_status(IN_PROGRESS);
@@ -102,9 +117,8 @@ public class TaskManager {
         return subtask;
     }
 
-    public Epic createEpic(Epic Epic) {
-        epic = new Epic();
-        idGenerator = allEpics.size() + 1;
+    public Epic createEpic(Epic epic) {
+        idGenerator += 1;
         epic.setId(idGenerator);
         epic.setCurrent_status(NEW);
         allEpics.put(idGenerator, epic);
@@ -142,29 +156,30 @@ public class TaskManager {
             }
 
 
-            int saveId = getAllSubtasks().get(id).getEpicsId();
+            int saveId = allSubtasks.get(id).getEpicsId();
             int a = 0;
             allSubtasks.put(id, subtask);
-            allEpics.get(saveId).includedSubtasks.set(id - 1, subtask);
+            int pomogite = allEpics.get(saveId).getIncludedSubtasks().indexOf(subtask);
+            allEpics.get(saveId).getIncludedSubtasks().set(pomogite, subtask);
 
 
-            getAllSubtasks().get(id).setEpicsId(saveId);
+            allSubtasks.get(id).setEpicsId(saveId);
 
 
             int i = subtask.getEpicsId();
-            for (Subtask includedSubtask : getAllEpics().get(i).includedSubtasks) {
+            for (Subtask includedSubtask : allEpics.get(i).getIncludedSubtasks()) {
                 if (includedSubtask.getCurrent_status() != DONE) {
                     a += 1;
 
                 }
 
                 if (includedSubtask.getCurrent_status() == IN_PROGRESS) {
-                    getAllEpics().get(i).setCurrent_status(IN_PROGRESS);
+                    allEpics.get(i).setCurrent_status(IN_PROGRESS);
                 }
             }
 
             if (a == 0) {
-                getAllEpics().get(1).setCurrent_status(DONE);
+                allEpics.get(i).setCurrent_status(DONE);
             }
 
 
@@ -188,7 +203,7 @@ public class TaskManager {
 
     // Удаление по идентификатору.
 
-    public void deleteTaskById(Task task, int id) {
+    public void deleteTaskById(int id) {
         if (allTasks.containsKey(id)) {
             allTasks.remove(id);
         } else {
@@ -197,7 +212,7 @@ public class TaskManager {
         }
     }
 
-    public void deleteSubtaskById(Subtask subtask, int id) {
+    public void deleteSubtaskById(int id) {
         if (allSubtasks.containsKey(id)) {
             allSubtasks.remove(id);
         } else {
@@ -206,7 +221,7 @@ public class TaskManager {
         }
     }
 
-    public void deleteEpicsById(Epic epic, int id) {
+    public void deleteEpicsById(int id) {
         if (allEpics.containsKey(id)) {
             allEpics.remove(id);
         } else {
