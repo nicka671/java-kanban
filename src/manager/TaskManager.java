@@ -14,7 +14,6 @@ public class TaskManager {
     private int idGenerator = 0;
 
 
-
     // Возможность хранить задачи всех типов.
 
     private HashMap<Integer, Task> allTasks = new HashMap<>();
@@ -26,8 +25,7 @@ public class TaskManager {
 
     public ArrayList<Task> getAllTasks() {
         ArrayList<Task> taskList = new ArrayList<>();
-        for (Task task : allTasks.values())
-        {
+        for (Task task : allTasks.values()) {
             taskList.add(task);
         }
         return taskList;
@@ -41,14 +39,13 @@ public class TaskManager {
         return subtaskList;
     }
 
-        public ArrayList<Epic> getAllEpics() {
-            ArrayList<Epic> epicsList = new ArrayList<>();
-            for (Epic epic : allEpics.values()) {
-                epicsList.add(epic);
-            }
-            return epicsList;
+    public ArrayList<Epic> getAllEpics() {
+        ArrayList<Epic> epicsList = new ArrayList<>();
+        for (Epic epic : allEpics.values()) {
+            epicsList.add(epic);
         }
-
+        return epicsList;
+    }
 
 
     //  Удаление всех задач.
@@ -181,23 +178,21 @@ public class TaskManager {
             if (a == 0) {
                 allEpics.get(i).setCurrent_status(DONE);
             }
-
-
-            return subtask;
         } else {
             System.out.println("Введите конкретный идентификатор");
-            return subtask;
         }
+
+        return subtask;
     }
 
     public Epic updateEpic(Epic epic, int id) {
         if (allEpics.containsKey(id)) {
             allEpics.put(id, epic);
-            return epic;
         } else {
             System.out.println("Введите конкретный идентификатор");
-            return epic;
         }
+
+        return epic;
     }
 
 
